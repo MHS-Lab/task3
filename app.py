@@ -22,14 +22,11 @@ def join():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
-        city = request.form['city']
-        country = request.form['country']
-        phone = request.form['phone']
         with sqlite3.connect("datahouse.db") as users:
             cursor = users.cursor()
             cursor.execute("INSERT INTO PARTICIPANTS \
-            (name,email,city,country,phone) VALUES (?,?,?,?,?)",
-                           (name, email, city, country, phone))
+            (name,email) VALUES (?,?)",
+                           (name, email))
             users.commit()
         return render_template("index.html")
     else:
