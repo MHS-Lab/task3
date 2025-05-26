@@ -17,8 +17,8 @@ def init_db():
 
 init_db()
 
-@app.route('/join', methods=['GET', 'POST'])
-def join():
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
@@ -30,7 +30,8 @@ def join():
             users.commit()
         return render_template("index.html")
     else:
-        return render_template('join.html')
+        return render_template('login.html')
+
 
 @app.route('/participants')
 def participants():
@@ -39,6 +40,12 @@ def participants():
         cursor.execute('SELECT * FROM PARTICIPANTS')
         data = cursor.fetchall()
     return render_template("participants.html", data=data)
+
+@app.route('/join')
+def join():
+    with sqlite3.connect('datahouse.db') as conn:
+        
+    return render_template("join.html")
 
 
 if __name__ == '__main__':
