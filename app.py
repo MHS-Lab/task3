@@ -43,8 +43,6 @@ def participants():
 
 @app.route('/join')
 def join():
-    with sqlite3.connect('datahouse.db') as conn:
-        
     return render_template("join.html")
 
 
