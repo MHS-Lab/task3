@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="colour.css">
         <title>Registation</title>
     </head>
     <body>
@@ -9,8 +10,10 @@
             <input type="name" name="name" placeholder="Enter your name" required><br/>
             <label>Enter Email:</label>
             <input type="email" name="email" placeholder="Enter your email" required><br/>
+            <label>Enter Password:</label>
+            <input type="password" name="password" placeholder="Enter your password" required><br/>
             <input type = "submit" value = "submit"/><br/>
-            <button class="btn" type="submit" onclick="window.location.href='{{ url_for('participants') }}';">Check participant list</button>
+            <button class="btn" type="submit" onclick="window.location.href='{{ url_for('login') }}';">Return to login</button>
         </form>
     </body>
 </html>

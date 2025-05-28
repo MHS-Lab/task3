@@ -22,6 +22,7 @@ def login():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
+        password = request.form['password']
         with sqlite3.connect("datahouse.db") as users:
             cursor = users.cursor()
             cursor.execute("INSERT INTO PARTICIPANTS \
