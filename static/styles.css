@@ -1,11 +1,25 @@
 
 
 body{    
-    background-color: lightblue;
+    background-color: #FFFDD0;
 }
 
-title {
-    color: darkblue;
+h1 {
+    color: purple;
    
     text-align: center;
+}
+
+button {
+    background-color: lightblue;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    align-items: center;
+}
+button:hover {
+    background-color: gray;
+    color: black;
 }
