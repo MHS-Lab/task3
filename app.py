@@ -26,7 +26,7 @@ def login():
         with sqlite3.connect("datahouse.db") as users:
             cursor = users.cursor()
             cursor.execute("INSERT INTO PARTICIPANTS \
-            (name,email) VALUES (?,?)",
+            (name,email,password) VALUES (?,?)",
                            (name, email))
             users.commit()
         return render_template("index.html")

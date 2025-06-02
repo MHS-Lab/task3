@@ -2,18 +2,27 @@
 <html>
     <head>
         <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-        <title>Registation</title>
+        <title>Registration</title>
     </head>
     <body>
+        <br>
+        <br>
         <form method="POST">
-            <label style="text-align: center;">Enter Name:</label>
-            <input type="name" name="name" placeholder="Enter your name" required><br/>
-            <label>Enter Email:</label>
-            <input type="email" name="email" placeholder="Enter your email" required><br/>
-            <label>Enter Password:</label>
-            <input type="password" name="password" placeholder="Enter your password" required><br/>
-            <input type = "submit" value = "submit"/><br/>
-            <button class="btn" type="submit" onclick="window.location.href='{{ url_for('login') }}';">Return to login</button>
+            <div style="text-align: center;">
+                <label>Enter Name:</label>
+                <input type="text" name="name" placeholder="Enter your name" required><br/>
+                <label>Enter Email:</label>
+                <input type="email" name="email" placeholder="Enter your email" required><br/>
+                <label>Enter Password:</label>
+                <input type="password" name="password" placeholder="Enter your password" required><br/>
+                <label>Confirm Password:</label>
+                <input type="password" name="password" placeholder="Confirm your password" required><br/>
+                <input type="submit" value="submit"/><br/>
+                <br>
+                <br>
+                <br>
+                <button class="btn" type="button" onclick="window.location.href='{{ url_for('login') }}';">Return to login</button>
+            </div>
         </form>
     </body>
 </html>
