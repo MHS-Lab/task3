@@ -17,21 +17,22 @@ def init_db():
 
 init_db()
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/join', methods=['GET', 'POST'])
+def join():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
+        confirm_password = request.form['confirm_password']
         with sqlite3.connect("datahouse.db") as users:
             cursor = users.cursor()
             cursor.execute("INSERT INTO PARTICIPANTS \
-            (name,email,password) VALUES (?,?)",
-                           (name, email))
+            (name,email,password,confirm_password) VALUES (?,?)",
+                           (name, email, password, confirm_password))
             users.commit()
         return render_template("index.html")
     else:
-        return render_template('login.html')
+        return render_template('join.html')
 
 
 @app.route('/participants')
@@ -42,9 +43,9 @@ def participants():
         data = cursor.fetchall()
     return render_template("participants.html", data=data)
 
-@app.route('/join')
-def join():
-    return render_template("join.html")
+@app.route('/login')
+def login():
+    return render_template("login.html")
 
 
 if __name__ == '__main__':

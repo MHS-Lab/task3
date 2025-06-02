@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        <title>PUMICE</title>
+    </head>
+    <body>
+        <h1>Thank you for your submission!</h1>
+        <div style="text-align:center;">
+            <button class="btn" type="button"
+                    onclick="window.location.href='{{ url_for('index') }}';">
+                Return to Home
+            </button>
+        </div>
+    </body>
+</html>
