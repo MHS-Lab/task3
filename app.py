@@ -12,13 +12,13 @@ def init_db():
     with sqlite3.connect('datahouse.db') as conn:
         conn.execute(
             'CREATE TABLE IF NOT EXISTS PARTICIPANTS (name TEXT, \
-            email TEXT, city TEXT, country TEXT, phone TEXT)'
+            email TEXT, password TEXT, confirm_password TEXT)'
         )
 
 init_db()
 
-@app.route('/join', methods=['GET', 'POST'])
-def join():
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
@@ -27,12 +27,12 @@ def join():
         with sqlite3.connect("datahouse.db") as users:
             cursor = users.cursor()
             cursor.execute("INSERT INTO PARTICIPANTS \
-            (name,email,password,confirm_password) VALUES (?,?)",
+            (name,email,password,confirm_password) VALUES (?,?,?,?)",
                            (name, email, password, confirm_password))
             users.commit()
         return render_template("index.html")
     else:
-        return render_template('join.html')
+        return render_template('login.html')
 
 
 @app.route('/participants')
@@ -43,9 +43,17 @@ def participants():
         data = cursor.fetchall()
     return render_template("participants.html", data=data)
 
-@app.route('/login')
-def login():
-    return render_template("login.html")
+@app.route('/join', methods=['GET', 'POST'])
+def join():
+    if request.method == 'POST':
+        # Handle form data here (e.g., save to database)
+        # Example:
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        # Add your database logic here if needed
+        return render_template("index.html")  # Or a success page
+    return render_template("join.html")
 
 
 if __name__ == '__main__':
