@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 import time
 
@@ -20,6 +20,9 @@ def init_db():
             'option TEXT UNIQUE, '
             'user TEXT, '
             'timestamp REAL)'
+        )
+        conn.execute(
+            'CREATE TABLE IF NOT EXISTS REASONS (id INTEGER PRIMARY KEY AUTOINCREMENT, reason TEXT, timestamp REAL)'
         )
 
 init_db()
@@ -64,9 +67,18 @@ def join():
         return render_template("index.html")
     return render_template("join.html")
 
-@app.route('/home')
+@app.route('/home', methods=['GET', 'POST'])
 def home():
-    return render_template("home.html")
+    if request.method == 'POST':
+        reason = request.form.get('reason')
+        timestamp = time.time()
+        with sqlite3.connect('datahouse.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO REASONS (reason, timestamp) VALUES (?, ?)", (reason, timestamp))
+            conn.commit()
+        # Redirect or render next step, e.g. comp.html
+        return redirect(url_for('comp'))
+    return render_template('home.html')
 
 @app.route('/comp', methods=['GET', 'POST'])
 def comp():
@@ -90,7 +102,7 @@ def comp():
     if request.method == 'POST':
         selected = request.form.get('desktop')
         user = "user"  # Replace with actual user info if available
-        if selected not in taken:
+        if selected and selected not in taken:
             with sqlite3.connect("datahouse.db") as conn:
                 cursor = conn.cursor()
                 try:
