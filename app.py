@@ -76,7 +76,6 @@ def home():
             cursor = conn.cursor()
             cursor.execute("INSERT INTO REASONS (reason, timestamp) VALUES (?, ?)", (reason, timestamp))
             conn.commit()
-        # Redirect or render next step, e.g. comp.html
         return redirect(url_for('comp'))
     return render_template('home.html')
 
