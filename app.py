@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import sqlite3
+import time
 
 app = Flask(__name__)
 
@@ -14,7 +15,11 @@ def init_db():
             'CREATE TABLE IF NOT EXISTS PARTICIPANTS (name TEXT, email TEXT, password TEXT, confirm_password TEXT)'
         )
         conn.execute(
-            'CREATE TABLE IF NOT EXISTS DESKTOPS (id INTEGER PRIMARY KEY AUTOINCREMENT, option TEXT UNIQUE, user TEXT)'
+            'CREATE TABLE IF NOT EXISTS DESKTOPS ('
+            'id INTEGER PRIMARY KEY AUTOINCREMENT, '
+            'option TEXT UNIQUE, '
+            'user TEXT, '
+            'timestamp REAL)'
         )
 
 init_db()
@@ -66,30 +71,42 @@ def home():
 @app.route('/comp', methods=['GET', 'POST'])
 def comp():
     options = [f"Option {i}" for i in range(1, 9)]
-    taken = set()
+    now = time.time()
+    cutoff = now - 24*3600  # 24 hours ago
+
+    # Remove expired bookings (optional, for cleanup)
+    with sqlite3.connect("datahouse.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM DESKTOPS WHERE timestamp < ?", (cutoff,))
+        conn.commit()
+
+    # Get currently taken options (not expired)
+    with sqlite3.connect("datahouse.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT option FROM DESKTOPS WHERE timestamp >= ?", (cutoff,))
+        taken = set(row[0] for row in cursor.fetchall())
+
+    success = None
     if request.method == 'POST':
         selected = request.form.get('desktop')
         user = "user"  # Replace with actual user info if available
-        with sqlite3.connect("datahouse.db") as conn:
-            cursor = conn.cursor()
-            # Try to insert the selection, ignore if already taken
-            try:
-                cursor.execute("INSERT INTO DESKTOPS (option, user) VALUES (?, ?)", (selected, user))
-                conn.commit()
-            except sqlite3.IntegrityError:
-                pass  # Option already taken
-        # Refresh taken after insert
-        with sqlite3.connect("datahouse.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT option FROM DESKTOPS")
-            taken = set(row[0] for row in cursor.fetchall())
-        return render_template('comp.html', options=options, taken=taken, success=(selected not in taken))
-    else:
-        with sqlite3.connect("datahouse.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT option FROM DESKTOPS")
-            taken = set(row[0] for row in cursor.fetchall())
-        return render_template('comp.html', options=options, taken=taken)
+        if selected not in taken:
+            with sqlite3.connect("datahouse.db") as conn:
+                cursor = conn.cursor()
+                try:
+                    cursor.execute(
+                        "INSERT INTO DESKTOPS (option, user, timestamp) VALUES (?, ?, ?)",
+                        (selected, user, now)
+                    )
+                    conn.commit()
+                    success = True
+                    taken.add(selected)
+                except sqlite3.IntegrityError:
+                    success = False
+        else:
+            success = False
+
+    return render_template('comp.html', options=options, taken=taken, success=success)
 
 if __name__ == '__main__':
     app.run(debug=False)
