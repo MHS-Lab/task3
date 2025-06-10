@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        <title>PUMICE</title>
+    </head>
+    <body>
+        <h1>Please select a reason for booking.</h1>
+        <div style="text-align:center;">
+            <form method="POST" action="{{ url_for('comp') }}">
+                <label>
+                    <input type="radio" name="reason" value="Study">
+                    Study
+                </label><br>
+                <label>
+                    <input type="radio" name="reason" value="Games">
+                    Games
+                </label><br><br>
+                <input type="submit" value="Next">
+            </form>
+        </div>
+    </body>
+</html>

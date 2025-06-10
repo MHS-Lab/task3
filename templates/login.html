@@ -9,6 +9,9 @@
         <br>
         <form method="POST">
             <div style="text-align: center;">
+                {% if error %}
+                    <p style="color:red;">{{ error }}</p>
+                {% endif %}
                 <label>Enter Name:</label>
                 <input type="text" name="name" placeholder="Enter your name" required><br/>
                 <label>Enter Password:</label>

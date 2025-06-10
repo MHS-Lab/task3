@@ -5,10 +5,13 @@
         <title>PUMICE</title>
     </head>
     <body>
-        <h1>Thank you for your submission!</h1>
+        <div style="text-align:center;">
+            <img src="{{ url_for('static', filename='images.png') }}" alt="Success Image" style="display:block; margin: 0 auto;">
+        </div>
+        <h1>Success!</h1>
         <div style="text-align:center;">
             <button class="btn" type="button"
-                    onclick="window.location.href='{{ url_for('index') }}';">
+                    onclick="window.location.href='{{ url_for('home') }}';">
                 Return to Home
             </button>
         </div>
