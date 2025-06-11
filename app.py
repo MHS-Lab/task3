@@ -87,22 +87,19 @@ def home():
 def comp():
     options = [f"Option {i}" for i in range(1, 9)]
     now = time.time()
-    cutoff = now - 24*3600  # 24 hours ago
+    cutoff = now - 24*3600
     success = None
 
     with sqlite3.connect("datahouse.db") as conn:
         cursor = conn.cursor()
-        # Remove expired bookings
         cursor.execute("DELETE FROM DESKTOPS WHERE timestamp < ?", (cutoff,))
         conn.commit()
-
-        # Get currently taken options (not expired)
         cursor.execute("SELECT option FROM DESKTOPS WHERE timestamp >= ?", (cutoff,))
         taken = set(row[0] for row in cursor.fetchall())
 
         if request.method == 'POST':
             selected = request.form.get('desktop')
-            user = "user"  # Replace with actual user info if available
+            user = "user"
             now = time.time()
             if selected:
                 try:
