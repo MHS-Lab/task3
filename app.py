@@ -54,18 +54,22 @@ def participants():
 
 @app.route('/join', methods=['GET', 'POST'])
 def join():
+    error = None
     if request.method == 'POST':
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
         confirm_password = request.form['confirm_password']
+        if password != confirm_password:
+            error = "Passwords do not match."
+            return render_template("join.html", error=error)
         with sqlite3.connect("datahouse.db") as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO PARTICIPANTS (name, email, password, confirm_password) VALUES (?, ?, ?, ?)",
                            (name, email, password, confirm_password))
             conn.commit()
         return render_template("index.html")
-    return render_template("join.html")
+    return render_template("join.html", error=error)
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
