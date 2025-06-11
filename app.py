@@ -108,14 +108,18 @@ def comp():
                         (selected, user, now)
                     )
                     conn.commit()
-                    success = True
-                    taken.add(selected)
+                    # Redirect to thankyo.html after successful reservation
+                    return redirect(url_for('thankyo'))
                 except sqlite3.IntegrityError:
                     success = False
             else:
                 success = False
 
     return render_template('comp.html', options=options, taken=taken, success=success)
+
+@app.route('/thankyo')
+def thankyo():
+    return render_template('thankyo.html')
 
 if __name__ == '__main__':
     app.run(debug=False)

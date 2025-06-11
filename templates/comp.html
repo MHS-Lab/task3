@@ -12,15 +12,13 @@
                     <label>
                         <input type="radio" name="desktop" value="{{ option }}"
                             {% if option in taken %}disabled{% endif %} required>
-                        {{ option }} {% if option in taken %}(Taken){% endif %}
+                        {{ "Desktop " ~ loop.index }} {% if option in taken %}(Taken){% endif %}
                     </label><br>
                 {% endfor %}
                 <br>
                 <input type="submit" value="Reserve">
             </form>
-            {% if success is defined %}
-                    <p style="color:green;">Reservation successful!</p>
-            {% endif %}
+           
             <br>
             <button class="btn" type="button" onclick="window.location.href='{{ url_for('index') }}';">Return to Home</button>
         </div>
