@@ -12,7 +12,11 @@ def index():
 def init_db():
     with sqlite3.connect('datahouse.db') as conn:
         conn.execute(
-            'CREATE TABLE IF NOT EXISTS PARTICIPANTS (name TEXT, email TEXT, password TEXT, confirm_password TEXT)'
+            'CREATE TABLE IF NOT EXISTS PARTICIPANTS ('
+            'name TEXT, '
+            'email TEXT UNIQUE, '  # Make email unique
+            'password TEXT, '
+            'confirm_password TEXT)'
         )
         conn.execute(
             'CREATE TABLE IF NOT EXISTS DESKTOPS ('
@@ -65,8 +69,14 @@ def join():
             return render_template("join.html", error=error)
         with sqlite3.connect("datahouse.db") as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO PARTICIPANTS (name, email, password, confirm_password) VALUES (?, ?, ?, ?)",
-                           (name, email, password, confirm_password))
+            cursor.execute("SELECT * FROM PARTICIPANTS WHERE email=?", (email,))
+            if cursor.fetchone():
+                error = "Email already registered."
+                return render_template("join.html", error=error)
+            cursor.execute(
+                "INSERT INTO PARTICIPANTS (name, email, password, confirm_password) VALUES (?, ?, ?, ?)",
+                (name, email, password, confirm_password)
+            )
             conn.commit()
         return render_template("index.html")
     return render_template("join.html", error=error)
