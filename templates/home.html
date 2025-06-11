@@ -17,6 +17,9 @@
                     Games
                 </label><br><br>
                 <input type="submit" value="Next">
+                {% if error %}
+                    <p style="color:red; text-align:center;">{{ error }}</p>
+                {% endif %}
             </form>
         </div>
     </body>

@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import time
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'  # Needed for session
 
 @app.route('/')
 @app.route('/start')
@@ -42,7 +43,8 @@ def login():
             cursor.execute("SELECT * FROM PARTICIPANTS WHERE name=? AND password=?", (name, password))
             user = cursor.fetchone()
         if user:
-            return render_template("logsucc.html")  # Redirect to logsucc.html on success
+            session['user'] = name  # Store user in session
+            return render_template("logsucc.html")
         else:
             error = "Invalid name or password"
     return render_template('login.html', error=error)
@@ -83,6 +85,22 @@ def join():
 
 @app.route('/home', methods=['GET', 'POST'])
 def home():
+    error = None
+    user = session.get('user')
+    if not user:
+        return redirect(url_for('login'))  # Force login if not logged in
+
+    now = time.time()
+    cutoff = now - 24*3600
+
+    # Check if user has booked in the last 24 hours
+    with sqlite3.connect('datahouse.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM DESKTOPS WHERE user=? AND timestamp >= ?", (user, cutoff))
+        if cursor.fetchone():
+            error = "You can only book once per day."
+            return render_template('home.html', error=error)
+
     if request.method == 'POST':
         reason = request.form.get('reason')
         timestamp = time.time()
@@ -91,7 +109,7 @@ def home():
             cursor.execute("INSERT INTO REASONS (reason, timestamp) VALUES (?, ?)", (reason, timestamp))
             conn.commit()
         return redirect(url_for('comp'))
-    return render_template('home.html')
+    return render_template('home.html', error=error)
 
 @app.route('/comp', methods=['GET', 'POST'])
 def comp():
@@ -99,39 +117,33 @@ def comp():
     now = time.time()
     cutoff = now - 24*3600
     success = None
-    error = None
 
     with sqlite3.connect("datahouse.db") as conn:
         cursor = conn.cursor()
-        # Remove expired bookings
         cursor.execute("DELETE FROM DESKTOPS WHERE timestamp < ?", (cutoff,))
         conn.commit()
-        # Get taken options
         cursor.execute("SELECT option FROM DESKTOPS WHERE timestamp >= ?", (cutoff,))
         taken = set(row[0] for row in cursor.fetchall())
 
         if request.method == 'POST':
             selected = request.form.get('desktop')
-            user = "user"  # Replace with actual user info (e.g., from session)
+            user = "user"
             now = time.time()
-            # Check if user has booked in the last 24 hours
-            cursor.execute("SELECT * FROM DESKTOPS WHERE user=? AND timestamp >= ?", (user, cutoff))
-            if cursor.fetchone():
-                error = "You can only book once per day."
-            elif selected:
+            if selected:
                 try:
                     cursor.execute(
                         "INSERT INTO DESKTOPS (option, user, timestamp) VALUES (?, ?, ?)",
                         (selected, user, now)
                     )
                     conn.commit()
+                    # Redirect to thankyo.html after successful reservation
                     return redirect(url_for('thankyo'))
                 except sqlite3.IntegrityError:
-                    error = "That desktop is already taken."
+                    success = False
             else:
-                error = "Please select a desktop."
+                success = False
 
-    return render_template('comp.html', options=options, taken=taken, error=error)
+    return render_template('comp.html', options=options, taken=taken, success=success)
 
 @app.route('/thankyo')
 def thankyo():
