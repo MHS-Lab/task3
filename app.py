@@ -99,33 +99,39 @@ def comp():
     now = time.time()
     cutoff = now - 24*3600
     success = None
+    error = None
 
     with sqlite3.connect("datahouse.db") as conn:
         cursor = conn.cursor()
+        # Remove expired bookings
         cursor.execute("DELETE FROM DESKTOPS WHERE timestamp < ?", (cutoff,))
         conn.commit()
+        # Get taken options
         cursor.execute("SELECT option FROM DESKTOPS WHERE timestamp >= ?", (cutoff,))
         taken = set(row[0] for row in cursor.fetchall())
 
         if request.method == 'POST':
             selected = request.form.get('desktop')
-            user = "user"
+            user = "user"  # Replace with actual user info (e.g., from session)
             now = time.time()
-            if selected:
+            # Check if user has booked in the last 24 hours
+            cursor.execute("SELECT * FROM DESKTOPS WHERE user=? AND timestamp >= ?", (user, cutoff))
+            if cursor.fetchone():
+                error = "You can only book once per day."
+            elif selected:
                 try:
                     cursor.execute(
                         "INSERT INTO DESKTOPS (option, user, timestamp) VALUES (?, ?, ?)",
                         (selected, user, now)
                     )
                     conn.commit()
-                    # Redirect to thankyo.html after successful reservation
                     return redirect(url_for('thankyo'))
                 except sqlite3.IntegrityError:
-                    success = False
+                    error = "That desktop is already taken."
             else:
-                success = False
+                error = "Please select a desktop."
 
-    return render_template('comp.html', options=options, taken=taken, success=success)
+    return render_template('comp.html', options=options, taken=taken, error=error)
 
 @app.route('/thankyo')
 def thankyo():
