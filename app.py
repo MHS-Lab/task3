@@ -101,19 +101,19 @@ def comp():
     if request.method == 'POST':
         selected = request.form.get('desktop')
         user = "user"  # Replace with actual user info if available
-        if selected and selected not in taken:
-            with sqlite3.connect("datahouse.db") as conn:
-                cursor = conn.cursor()
-                try:
+        now = time.time()
+        if selected:
+            try:
+                with sqlite3.connect("datahouse.db") as conn:
+                    cursor = conn.cursor()
                     cursor.execute(
                         "INSERT INTO DESKTOPS (option, user, timestamp) VALUES (?, ?, ?)",
                         (selected, user, now)
                     )
                     conn.commit()
-                    success = True
-                    taken.add(selected)
-                except sqlite3.IntegrityError:
-                    success = False
+                success = True
+            except sqlite3.IntegrityError:
+                success = False
         else:
             success = False
 

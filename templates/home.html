@@ -7,9 +7,9 @@
     <body>
         <h1>Please select a reason for booking.</h1>
         <div style="text-align:center;">
-            <form method="POST" action="{{ url_for('comp') }}">
+            <form method="POST" action="{{ url_for('home') }}">
                 <label>
-                    <input type="radio" name="reason" value="Study">
+                    <input type="radio" name="reason" value="Study" required>
                     Study
                 </label><br>
                 <label>
