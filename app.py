@@ -84,38 +84,35 @@ def comp():
     options = [f"Option {i}" for i in range(1, 9)]
     now = time.time()
     cutoff = now - 24*3600  # 24 hours ago
+    success = None
 
-    # Remove expired bookings (optional, for cleanup)
     with sqlite3.connect("datahouse.db") as conn:
         cursor = conn.cursor()
+        # Remove expired bookings
         cursor.execute("DELETE FROM DESKTOPS WHERE timestamp < ?", (cutoff,))
         conn.commit()
 
-    # Get currently taken options (not expired)
-    with sqlite3.connect("datahouse.db") as conn:
-        cursor = conn.cursor()
+        # Get currently taken options (not expired)
         cursor.execute("SELECT option FROM DESKTOPS WHERE timestamp >= ?", (cutoff,))
         taken = set(row[0] for row in cursor.fetchall())
 
-    success = None
-    if request.method == 'POST':
-        selected = request.form.get('desktop')
-        user = "user"  # Replace with actual user info if available
-        now = time.time()
-        if selected:
-            try:
-                with sqlite3.connect("datahouse.db") as conn:
-                    cursor = conn.cursor()
+        if request.method == 'POST':
+            selected = request.form.get('desktop')
+            user = "user"  # Replace with actual user info if available
+            now = time.time()
+            if selected:
+                try:
                     cursor.execute(
                         "INSERT INTO DESKTOPS (option, user, timestamp) VALUES (?, ?, ?)",
                         (selected, user, now)
                     )
                     conn.commit()
-                success = True
-            except sqlite3.IntegrityError:
+                    success = True
+                    taken.add(selected)
+                except sqlite3.IntegrityError:
+                    success = False
+            else:
                 success = False
-        else:
-            success = False
 
     return render_template('comp.html', options=options, taken=taken, success=success)
 
