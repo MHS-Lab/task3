@@ -1,25 +1,29 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Flask and SQLite </title>
+        <title>Admin Only</title>
     </head>
     <style>
         table, th, td {
           border:1px solid black;
         }
-        </style>
+    </style>
     <body>
         <table style="width:100%">
             <tr>
               <th>Name</th>
               <th>Email</th>
+              <th>Reason</th>
+              <th>Desktop Booked</th>
             </tr>
-            {%for participant in data%}
+            {% for participant in data %}
                <tr>
-                 <td>{{participant[0]}}</td>
-                 <td>{{participant[1]}}</td>
+                 <td>{{ participant[0] }}</td>
+                 <td>{{ participant[1] }}</td>
+                 <td>{{ participant[2] or '' }}</td>
+                 <td>{{ participant[3] or '' }}</td>
                 </tr>
-            {%endfor%}
-          </table>          
+            {% endfor %}
+        </table>          
     </body>
 </html>

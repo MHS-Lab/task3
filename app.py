@@ -44,6 +44,9 @@ def login():
             user = cursor.fetchone()
         if user:
             session['user'] = name  # Store user in session
+            user_email = user[1]  # Assuming email is the second column
+            # On login, store email in session
+            session['user_email'] = user_email
             return render_template("logsucc.html")
         else:
             error = "Invalid name or password"
@@ -96,7 +99,8 @@ def home():
     # Check if user has booked in the last 24 hours
     with sqlite3.connect('datahouse.db') as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM DESKTOPS WHERE user=? AND timestamp >= ?", (user, cutoff))
+        user_email = session.get('user_email')
+        cursor.execute("SELECT * FROM DESKTOPS WHERE user=? AND timestamp >= ?", (user_email, cutoff))
         if cursor.fetchone():
             error = "You can only book once per day."
             return render_template('home.html', error=error)
@@ -133,7 +137,7 @@ def comp():
                 try:
                     cursor.execute(
                         "INSERT INTO DESKTOPS (option, user, timestamp) VALUES (?, ?, ?)",
-                        (selected, user, now)
+                        (selected, user_email, now)
                     )
                     conn.commit()
                     # Redirect to thankyo.html after successful reservation
@@ -153,9 +157,22 @@ def thankyo():
 def admin():
     with sqlite3.connect('datahouse.db') as conn:
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM PARTICIPANTS')
+        cursor.execute("""
+            SELECT 
+                p.name, 
+                p.email, 
+                r.reason, 
+                d.option
+            FROM PARTICIPANTS p
+            LEFT JOIN REASONS r ON p.email = r.rowid  -- Adjust join condition as needed
+            LEFT JOIN DESKTOPS d ON p.name = d.user   -- Adjust join condition as needed
+        """)
         data = cursor.fetchall()
     return render_template('participants.html', data=data)
+
+@app.route('/admin1')
+def admin1():
+    return render_template('admin1.html')
 
 if __name__ == '__main__':
     app.run(debug=False)
