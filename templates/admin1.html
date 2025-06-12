@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Admin Panel</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+    <body>
+        <div style="text-align:center; margin-top: 50px;">
+            <h1>Admin Panel</h1>
+            <a href="{{ url_for('admin') }}">
+                <button class="btn">View Participants</button>
+            </a>
+        </div>
+    </body>
+</html>

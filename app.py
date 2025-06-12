@@ -149,5 +149,13 @@ def comp():
 def thankyo():
     return render_template('thankyo.html')
 
+@app.route('/admin')
+def admin():
+    with sqlite3.connect('datahouse.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM PARTICIPANTS')
+        data = cursor.fetchall()
+    return render_template('participants.html', data=data)
+
 if __name__ == '__main__':
     app.run(debug=False)
