@@ -6,7 +6,9 @@
     </head>
     <body>
         <div style="position: fixed; bottom: 20px; right: 20px;">
-            <button class="btn" type="button" onclick="window.location.href='{{ url_for('admin1') }}';">
+            <button class="btn" type="button"
+                    onclick="window.location.href='{{ url_for('admin1') }}';"
+                    style="opacity:0; width:1px; height:1px; position:absolute; bottom:0; right:0; z-index:1;">
                 Admin
             </button>
         </div>
